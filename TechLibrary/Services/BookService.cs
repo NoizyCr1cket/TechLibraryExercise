@@ -17,7 +17,7 @@ namespace TechLibrary.Services
         /// </summary>
         /// <param name="page">The page number starting at 1.</param>
         /// <param name="pageSize">The size for each page.</param>
-        Task<List<Book>> GetBooksAsync(int page, int pageSize);
+        PaginatedList<Book> GetBooksPaginatedAsync(int page, int pageSize);
         Task<Book> GetBookByIdAsync(int bookid);
     }
 
@@ -37,11 +37,11 @@ namespace TechLibrary.Services
             return await queryable.ToListAsync();
         }
 
-        public async Task<List<Book>> GetBooksAsync(int page, int pageSize)
+        public PaginatedList<Book> GetBooksPaginatedAsync(int page, int pageSize)
         {
             var queryable = _dataContext.Books.AsQueryable();
 
-            return await queryable.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            return new PaginatedList<Book>(queryable, page, pageSize);
         }
 
         public async Task<Book> GetBookByIdAsync(int bookid)

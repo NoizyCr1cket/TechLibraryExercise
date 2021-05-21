@@ -78,10 +78,10 @@ namespace TechLibrary.Test.Services
         }
 
         [Test]
-        public async Task GetBooksAsync_PageSize0_ReturnsEmpty()
+        public void GetBooksPaginatedAsync_PageSize0_ReturnsEmpty()
         {
-            var books1 = await _bookService.GetBooksAsync(0, 0);
-            var books2 = await _bookService.GetBooksAsync(1, 0);
+            var books1 = _bookService.GetBooksPaginatedAsync(0, 0);
+            var books2 = _bookService.GetBooksPaginatedAsync(1, 0);
             
 
             Assert.AreEqual(0, books1.Count);
@@ -89,10 +89,10 @@ namespace TechLibrary.Test.Services
         }
 
         [Test]
-        public async Task GetBooksAsync_Page0_ReturnsFirstPage()
+        public void GetBooksPaginatedAsync_Page0_ReturnsFirstPage()
         {
-            var books1 = await _bookService.GetBooksAsync(0, 1);
-            var books2 = await _bookService.GetBooksAsync(0, 2);
+            var books1 = _bookService.GetBooksPaginatedAsync(0, 1);
+            var books2 = _bookService.GetBooksPaginatedAsync(0, 2);
 
             Assert.AreEqual(1, books1.Count);
             Assert.AreEqual(1, books1[0].BookId);
@@ -103,27 +103,36 @@ namespace TechLibrary.Test.Services
         }
 
         [Test]
-        public async Task GetBooksAsync_Page1AndPageSize1_ReturnsFirstBook()
+        public void GetBooksPaginatedAsync_Page1AndPageSize2_ReturnsCorrectTotalCountAndTotalPages()
         {
-            var books = await _bookService.GetBooksAsync(1, 1);
+            var books = _bookService.GetBooksPaginatedAsync(1, 2);
+
+            Assert.AreEqual(5, books.TotalCount);
+            Assert.AreEqual(3, books.TotalPages);
+        }
+
+        [Test]
+        public void GetBooksPaginatedAsync_Page1AndPageSize1_ReturnsFirstBook()
+        {
+            var books = _bookService.GetBooksPaginatedAsync(1, 1);
 
             Assert.AreEqual(1, books.Count);
             Assert.AreEqual(1, books[0].BookId);
         }
 
         [Test]
-        public async Task GetBooksAsync_Page2AndPageSize1_ReturnsSecondBook()
+        public void GetBooksPaginatedAsync_Page2AndPageSize1_ReturnsSecondBook()
         {
-            var books = await _bookService.GetBooksAsync(2, 1);
+            var books = _bookService.GetBooksPaginatedAsync(2, 1);
 
             Assert.AreEqual(1, books.Count);
             Assert.AreEqual(2, books[0].BookId);
         }
 
         [Test]
-        public async Task GetBooksAsync_Page1AndPageSize2_ReturnsFirstTwoBooks()
+        public void GetBooksPaginatedAsync_Page1AndPageSize2_ReturnsFirstTwoBooks()
         {
-            var books = await _bookService.GetBooksAsync(1, 2);
+            var books = _bookService.GetBooksPaginatedAsync(1, 2);
 
             Assert.AreEqual(2, books.Count);
             Assert.AreEqual(1, books[0].BookId);
@@ -131,9 +140,9 @@ namespace TechLibrary.Test.Services
         }
 
         [Test]
-        public async Task GetBooksAsync_Page2AndPageSize2_ReturnsSecondTwoBooks()
+        public void GetBooksPaginatedAsync_Page2AndPageSize2_ReturnsSecondTwoBooks()
         {
-            var books = await _bookService.GetBooksAsync(2, 2);
+            var books = _bookService.GetBooksPaginatedAsync(2, 2);
 
             Assert.AreEqual(2, books.Count);
             Assert.AreEqual(3, books[0].BookId);
@@ -141,18 +150,18 @@ namespace TechLibrary.Test.Services
         }
 
         [Test]
-        public async Task GetBooksAsync_Page3AndPageSize2_ReturnsLastBook()
+        public void GetBooksPaginatedAsync_Page3AndPageSize2_ReturnsLastBook()
         {
-            var books = await _bookService.GetBooksAsync(3, 2);
+            var books = _bookService.GetBooksPaginatedAsync(3, 2);
 
             Assert.AreEqual(1, books.Count);
             Assert.AreEqual(5, books[0].BookId);
         }
 
         [Test]
-        public async Task GetBooksAsync_Page4AndPageSize2_ReturnsEmpty()
+        public void GetBooksPaginatedAsync_Page4AndPageSize2_ReturnsEmpty()
         {
-            var books = await _bookService.GetBooksAsync(4, 2);
+            var books = _bookService.GetBooksPaginatedAsync(4, 2);
 
             Assert.AreEqual(0, books.Count);
         }

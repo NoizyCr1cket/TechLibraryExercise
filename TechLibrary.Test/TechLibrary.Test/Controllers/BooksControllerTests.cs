@@ -51,47 +51,47 @@ namespace TechLibrary.Controllers.Tests
         }
 
         [Test()]
-        public async Task GetBooks_WithPageAndPageSize_CallsGetBooksAsyncWithParams()
+        public async Task GetBooksPaginated_WithPageAndPageSize_CallsGetBooksAsyncWithParams()
         {
             //  Arrange
             var page = 1;
             var pageSize = 3;
-            _mockBookService.Setup(b => b.GetBooksAsync(page, pageSize)).Returns(Task.FromResult(It.IsAny<List<Domain.Book>>()));
+            _mockBookService.Setup(b => b.GetBooksPaginatedAsync(page, pageSize)).Returns(It.IsAny<Domain.PaginatedList<Domain.Book>>());
             var sut = new BooksController(_mockLogger.Object, _mockBookService.Object, _mockMapper.Object);
 
             //  Act
             var result = await sut.GetBooks(page, pageSize);
 
             //  Assert
-            _mockBookService.Verify(s => s.GetBooksAsync(page, pageSize), Times.Once, $"Expected GetBooksAsync to have been called once with provided page {page} and pageSize {pageSize}");
+            _mockBookService.Verify(s => s.GetBooksPaginatedAsync(page, pageSize), Times.Once, $"Expected GetBooksPaginatedAsync to have been called once with provided page {page} and pageSize {pageSize}");
         }
 
         [Test()]
-        public async Task GetBooks_WithPageOnly_DoesNotCall()
+        public async Task GetBooksPaginated_WithPageOnly_DoesNotCall()
         {
             //  Arrange
-            _mockBookService.Setup(b => b.GetBooksAsync(It.IsAny<int>(), It.IsAny<int>())).Returns(Task.FromResult(It.IsAny<List<Domain.Book>>()));
+            _mockBookService.Setup(b => b.GetBooksPaginatedAsync(It.IsAny<int>(), It.IsAny<int>())).Returns(It.IsAny<Domain.PaginatedList<Domain.Book>>());
             var sut = new BooksController(_mockLogger.Object, _mockBookService.Object, _mockMapper.Object);
 
             //  Act
             var result = await sut.GetBooks(1, null);
 
             //  Assert
-            _mockBookService.Verify(s => s.GetBooksAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never, $"Expected GetBooksAsync to never have been called");
+            _mockBookService.Verify(s => s.GetBooksPaginatedAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never, $"Expected GetBooksPaginatedAsync to never have been called");
         }
 
         [Test()]
-        public async Task GetBooks_WithPageSizeOnly_DoesNotCall()
+        public async Task GetBooksPaginated_WithPageSizeOnly_DoesNotCall()
         {
             //  Arrange
-            _mockBookService.Setup(b => b.GetBooksAsync(It.IsAny<int>(), It.IsAny<int>())).Returns(Task.FromResult(It.IsAny<List<Domain.Book>>()));
+            _mockBookService.Setup(b => b.GetBooksPaginatedAsync(It.IsAny<int>(), It.IsAny<int>())).Returns(It.IsAny<Domain.PaginatedList<Domain.Book>>());
             var sut = new BooksController(_mockLogger.Object, _mockBookService.Object, _mockMapper.Object);
 
             //  Act
             var result = await sut.GetBooks(null, 3);
 
             //  Assert
-            _mockBookService.Verify(s => s.GetBooksAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never, $"Expected GetBooksAsync to never have been called");
+            _mockBookService.Verify(s => s.GetBooksPaginatedAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Never, $"Expected GetBooksPaginatedAsync to never have been called");
         }
     }
 }

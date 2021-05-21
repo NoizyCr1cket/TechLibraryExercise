@@ -31,9 +31,9 @@ namespace TechLibrary.Controllers
             {
                 _logger.LogInformation($"Get books on page {page} with page size {pageSize}.");
 
-                var books = await _bookService.GetBooksAsync(page.Value, pageSize.Value);
+                var books = _bookService.GetBooksPaginatedAsync(page.Value, pageSize.Value);
 
-                var bookResponse = _mapper.Map<List<BookResponse>>(books);
+                var bookResponse = _mapper.Map<PaginatedListResponse<BookResponse>>(books);
 
                 return Ok(bookResponse);
             }
