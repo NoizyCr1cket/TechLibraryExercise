@@ -25,15 +25,43 @@ namespace TechLibrary.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetBooks([FromQuery] int? page = null, [FromQuery] int? pageSize = null)
         {
-            _logger.LogInformation("Get all books");
+            if (page.HasValue && pageSize.HasValue)
+            {
+                _logger.LogInformation($"Get books on page {page} with page size {pageSize}.");
 
-            var books = await _bookService.GetBooksAsync();
+                var books = await _bookService.GetBooksAsync(page.Value, pageSize.Value);
 
-            var bookResponse = _mapper.Map<List<BookResponse>>(books);
+                var bookResponse = _mapper.Map<List<BookResponse>>(books);
 
-            return Ok(bookResponse);
+                return Ok(bookResponse);
+            }
+            else
+            {
+                if (page.HasValue)
+                {
+                    _logger.LogInformation("Get books missing value for page size.");
+
+                    return UnprocessableEntity("Parameter pageSize is missing a value.");
+                }
+                else if (pageSize.HasValue)
+                {
+                    _logger.LogInformation("Get books missing value for page.");
+
+                    return UnprocessableEntity("Parameter page is missing a value.");
+                }
+                else
+                {
+                    _logger.LogInformation("Get all books.");
+
+                    var books = await _bookService.GetBooksAsync();
+
+                    var bookResponse = _mapper.Map<List<BookResponse>>(books);
+
+                    return Ok(bookResponse);
+                }
+            }
         }
 
         [HttpGet("{id}")]
