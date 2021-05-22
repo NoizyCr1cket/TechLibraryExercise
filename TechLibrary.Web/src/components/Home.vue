@@ -2,7 +2,8 @@
     <div class="home">
         <h1>{{ msg }}</h1>
 
-        <b-table striped hover :items="dataContext" :fields="fields" responsive="sm">
+        <b-pagination v-model="currentPage" :total-rows="totalItems" :per-page="perPage" align="center" v-on:change="onPageChanged"></b-pagination>
+        <b-table striped hover :items="dataContext" :fields="fields" responsive="sm" :per-page="10" :current-page="currentPage">
             <template v-slot:cell(thumbnailUrl)="data">
                 <b-img :src="data.value" thumbnail fluid></b-img>
             </template>
@@ -29,16 +30,23 @@
                 { key: 'descr', label: 'Description', sortable: true, sortDirection: 'desc' }
 
             ],
-            items: []
+            items: [],
+            currentPage: 1,
+            perPage: 10,
+            totalItems: 0,
         }),
         
         methods: {
             dataContext(ctx, callback) {
-                axios.get("https://localhost:5001/books")
+                axios.get(`https://localhost:5001/books?page=${ctx.currentPage}&pageSize=${ctx.perPage}`)
                     .then(response => {
-                        
-                        callback(response.data);
+                        this.totalItems = response.data.totalCount;
+                        this.currentPage = response.data.pageNumber;
+                        callback(response.data.items);
                     });
+            },
+            onPageChanged(pageNumber) {
+                this.currentPage = pageNumber;
             }
         }
     };
