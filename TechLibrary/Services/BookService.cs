@@ -17,7 +17,8 @@ namespace TechLibrary.Services
         /// </summary>
         /// <param name="page">The page number starting at 1.</param>
         /// <param name="pageSize">The size for each page.</param>
-        PaginatedList<Book> GetBooksPaginatedAsync(int page, int pageSize);
+        /// <param name="query">Optional query text to use to search for books.</param>
+        PaginatedList<Book> GetBooksPaginatedAsync(int page, int pageSize, string query = null);
         Task<Book> GetBookByIdAsync(int bookid);
     }
 
@@ -37,9 +38,19 @@ namespace TechLibrary.Services
             return await queryable.ToListAsync();
         }
 
-        public PaginatedList<Book> GetBooksPaginatedAsync(int page, int pageSize)
+        public PaginatedList<Book> GetBooksPaginatedAsync(int page, int pageSize, string query = null)
         {
-            var queryable = _dataContext.Books.AsQueryable();
+            IQueryable<Book> queryable;
+
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                queryable = _dataContext.Books.AsQueryable();
+            }
+            else
+            {
+                var uppercaseQuery = query.ToUpper();
+                queryable = _dataContext.Books.Where(book => book.Title.ToUpper().Contains(uppercaseQuery) || book.ShortDescr.ToUpper().Contains(uppercaseQuery));
+            }
 
             return new PaginatedList<Book>(queryable, page, pageSize);
         }

@@ -25,13 +25,13 @@ namespace TechLibrary.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetBooks([FromQuery] int? page = null, [FromQuery] int? pageSize = null)
+        public async Task<IActionResult> GetBooks([FromQuery] int? page = null, [FromQuery] int? pageSize = null, [FromQuery] string query = null)
         {
             if (page.HasValue && pageSize.HasValue)
             {
                 _logger.LogInformation($"Get books on page {page} with page size {pageSize}.");
 
-                var books = _bookService.GetBooksPaginatedAsync(page.Value, pageSize.Value);
+                var books = _bookService.GetBooksPaginatedAsync(page.Value, pageSize.Value, query);
 
                 var bookResponse = _mapper.Map<PaginatedListResponse<BookResponse>>(books);
 

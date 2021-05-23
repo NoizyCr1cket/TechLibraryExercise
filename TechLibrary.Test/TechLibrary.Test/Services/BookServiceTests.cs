@@ -46,11 +46,11 @@ namespace TechLibrary.Test.Services
             _dataContext.Database.EnsureCreated();
 
             _dataContext.AddRange(
-                new Book() { BookId = 1 },
-                new Book() { BookId = 2 },
-                new Book() { BookId = 3 },
-                new Book() { BookId = 4 },
-                new Book() { BookId = 5 });
+                new Book() { BookId = 1, Title = "A", ShortDescr = "B" },
+                new Book() { BookId = 2, Title = "B", ShortDescr = "C" },
+                new Book() { BookId = 3, Title = "C", ShortDescr = "C" },
+                new Book() { BookId = 4, Title = "C", ShortDescr = "C" },
+                new Book() { BookId = 5, Title = "C", ShortDescr = "C" });
 
             _dataContext.SaveChanges();
         }
@@ -164,6 +164,98 @@ namespace TechLibrary.Test.Services
             var books = _bookService.GetBooksPaginatedAsync(4, 2);
 
             Assert.AreEqual(0, books.Count);
+        }
+
+        [Test]
+        public void GetBooksPaginatedAsync_QueryNull_ReturnsAllBooks()
+        {
+            var books = _bookService.GetBooksPaginatedAsync(1, 5, null);
+
+            Assert.AreEqual(5, books.Count);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(1, books[0].BookId);
+                Assert.AreEqual(2, books[1].BookId);
+                Assert.AreEqual(3, books[2].BookId);
+                Assert.AreEqual(4, books[3].BookId);
+                Assert.AreEqual(5, books[4].BookId);
+            });
+        }
+
+        [Test]
+        public void GetBooksPaginatedAsync_QueryEmptyString_ReturnsAllBooks()
+        {
+            var books = _bookService.GetBooksPaginatedAsync(1, 5, string.Empty);
+
+            Assert.AreEqual(5, books.Count);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(1, books[0].BookId);
+                Assert.AreEqual(2, books[1].BookId);
+                Assert.AreEqual(3, books[2].BookId);
+                Assert.AreEqual(4, books[3].BookId);
+                Assert.AreEqual(5, books[4].BookId);
+            });
+        }
+
+        [Test]
+        public void GetBooksPaginatedAsync_QueryWhitespaceString_ReturnsAllBooks()
+        {
+            var books = _bookService.GetBooksPaginatedAsync(1, 5, " ");
+
+            Assert.AreEqual(5, books.Count);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(1, books[0].BookId);
+                Assert.AreEqual(2, books[1].BookId);
+                Assert.AreEqual(3, books[2].BookId);
+                Assert.AreEqual(4, books[3].BookId);
+                Assert.AreEqual(5, books[4].BookId);
+            });
+        }
+
+        [Test]
+        public void GetBooksPaginatedAsync_QueryA_ReturnsFirstBook()
+        {
+            var books = _bookService.GetBooksPaginatedAsync(1, 5, "A");
+
+            Assert.AreEqual(1, books.Count);
+            Assert.AreEqual(1, books[0].BookId);
+        }
+
+        [Test]
+        public void GetBooksPaginatedAsync_QueryLowercaseA_ReturnsFirstBook()
+        {
+            var books = _bookService.GetBooksPaginatedAsync(1, 5, "a");
+
+            Assert.AreEqual(1, books.Count);
+            Assert.AreEqual(1, books[0].BookId);
+        }
+
+        [Test]
+        public void GetBooksPaginatedAsync_QueryB_ReturnsFirstTwoBooks()
+        {
+            var books = _bookService.GetBooksPaginatedAsync(1, 5, "B");
+
+            Assert.AreEqual(2, books.Count);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(1, books[0].BookId);
+                Assert.AreEqual(2, books[1].BookId);
+            });
+        }
+
+        [Test]
+        public void GetBooksPaginatedAsync_Page2AndPageSize2AndQueryC_ReturnsLastTwoBooks()
+        {
+            var books = _bookService.GetBooksPaginatedAsync(2, 2, "C");
+
+            Assert.AreEqual(2, books.Count);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(4, books[0].BookId);
+                Assert.AreEqual(5, books[1].BookId);
+            });
         }
     }
 }
