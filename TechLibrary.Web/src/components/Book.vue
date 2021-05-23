@@ -60,7 +60,7 @@
         methods: {
             save() {
                 this.book.thumbnailUrl = this.thumbnailUrl;
-                axios.put(`https://localhost:5001/books/${this.id}`, this.book)
+                axios.put(`https://localhost:5001/books/${this.id}`, this.book);
                 this.editMode = false;
             }
         }
