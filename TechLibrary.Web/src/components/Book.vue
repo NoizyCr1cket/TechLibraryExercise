@@ -20,7 +20,7 @@
                     <label for="isbn-input">ISBN</label>
                 </b-col>
                 <b-col sm="8">
-                    <b-form-input id="isbn-input" class="input" v-if="editMode" v-model="book.isbn" placeholder="Enter ISBN"></b-form-input>
+                    <b-form-input id="isbn-input" class="input" v-model="book.isbn" placeholder="Enter ISBN"></b-form-input>
                 </b-col>
             </b-row>
             <b-form-input class="input" v-if="editMode" v-model="book.title" placeholder="Enter a title"></b-form-input>
