@@ -20,6 +20,7 @@ namespace TechLibrary.Services
         /// <param name="query">Optional query text to use to search for books.</param>
         PaginatedList<Book> GetBooksPaginatedAsync(int page, int pageSize, string query = null);
         Task<Book> GetBookByIdAsync(int bookid);
+        Task UpdateBookAsync(Book editedBook);
     }
 
     public class BookService : IBookService
@@ -58,6 +59,13 @@ namespace TechLibrary.Services
         public async Task<Book> GetBookByIdAsync(int bookid)
         {
             return await _dataContext.Books.SingleOrDefaultAsync(x => x.BookId == bookid);
+        }
+
+        public async Task UpdateBookAsync(Book updatedBook)
+        {
+            var book = await _dataContext.Books.SingleAsync(x => x.BookId == updatedBook.BookId);
+            _dataContext.Entry(book).CurrentValues.SetValues(updatedBook);
+            await _dataContext.SaveChangesAsync();
         }
     }
 }

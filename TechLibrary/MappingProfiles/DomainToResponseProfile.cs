@@ -11,6 +11,7 @@ namespace TechLibrary.MappingProfiles
         {
             CreateMap<Book, BookResponse>().ForMember(x => x.Descr, opt => opt.MapFrom(src => src.ShortDescr));
             CreateMap<PaginatedList<Book>, PaginatedListResponse<BookResponse>>().ForMember(x => x.Items, opt => opt.MapFrom(src => (List<Book>)src));
+            CreateMap<BookRequest, Book>().ForMember(x => x.ShortDescr, opt => opt.MapFrom(src => src.Descr));
         }
     }
 }

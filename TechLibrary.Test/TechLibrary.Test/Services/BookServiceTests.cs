@@ -28,7 +28,7 @@ namespace TechLibrary.Test.Services
             _dataContext = new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlite(_connection).Options);
             _bookService = new BookService(_dataContext);
 
-            Seed();
+            Seed(_connection);
         }
 
         private DbConnection CreateInMemoryConnection()
@@ -40,19 +40,23 @@ namespace TechLibrary.Test.Services
             return connection;
         }
 
-        private void Seed()
+        private void Seed(DbConnection connection)
         {
-            _dataContext.Database.EnsureDeleted();
-            _dataContext.Database.EnsureCreated();
+            // Use new DataContext so these inserts are not tracked in the same context as tests.
+            using (var dataContext = new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlite(connection).Options))
+            {
+                dataContext.Database.EnsureDeleted();
+                dataContext.Database.EnsureCreated();
 
-            _dataContext.AddRange(
-                new Book() { BookId = 1, Title = "A", ShortDescr = "B" },
-                new Book() { BookId = 2, Title = "B", ShortDescr = "C" },
-                new Book() { BookId = 3, Title = "C", ShortDescr = "C" },
-                new Book() { BookId = 4, Title = "C", ShortDescr = "C" },
-                new Book() { BookId = 5, Title = "C", ShortDescr = "C" });
+                dataContext.AddRange(
+                   new Book() { BookId = 1, Title = "A", ShortDescr = "B" },
+                   new Book() { BookId = 2, Title = "B", ShortDescr = "C" },
+                   new Book() { BookId = 3, Title = "C", ShortDescr = "C" },
+                   new Book() { BookId = 4, Title = "C", ShortDescr = "C" },
+                   new Book() { BookId = 5, Title = "C", ShortDescr = "C" });
 
-            _dataContext.SaveChanges();
+                dataContext.SaveChanges();
+            }
         }
 
         [OneTimeTearDown]
@@ -82,7 +86,7 @@ namespace TechLibrary.Test.Services
         {
             var books1 = _bookService.GetBooksPaginatedAsync(0, 0);
             var books2 = _bookService.GetBooksPaginatedAsync(1, 0);
-            
+
 
             Assert.AreEqual(0, books1.Count);
             Assert.AreEqual(0, books2.Count);
@@ -255,6 +259,43 @@ namespace TechLibrary.Test.Services
             {
                 Assert.AreEqual(4, books[0].BookId);
                 Assert.AreEqual(5, books[1].BookId);
+            });
+        }
+
+        [Test]
+        public async Task UpdateBookAsync_UpdateFirstBook_PersistsUpdates()
+        {
+            // Need to use a new connection specifically for this test so data updates don't break other tests.
+            var connection = CreateInMemoryConnection();
+            var dataContext = new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlite(connection).Options);
+            var bookService = new BookService(dataContext);
+
+            Seed(connection);
+
+            var updatedBook = new Book()
+            {
+                BookId = 1,
+                ISBN = "1234567890123",
+                LongDescr = "New long description.",
+                PublishedDate = "New published date",
+                ShortDescr = "New short description.",
+                ThumbnailUrl = "https://via.placeholder.com/150x200",
+                Title = "New Title",
+            };
+
+            await bookService.UpdateBookAsync(updatedBook);
+
+            var result = await bookService.GetBookByIdAsync(updatedBook.BookId);
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(updatedBook.BookId, result.BookId);
+                Assert.AreEqual(updatedBook.ISBN, result.ISBN);
+                Assert.AreEqual(updatedBook.LongDescr, result.LongDescr);
+                Assert.AreEqual(updatedBook.PublishedDate, result.PublishedDate);
+                Assert.AreEqual(updatedBook.ShortDescr, result.ShortDescr);
+                Assert.AreEqual(updatedBook.ThumbnailUrl, result.ThumbnailUrl);
+                Assert.AreEqual(updatedBook.Title, result.Title);
             });
         }
     }
