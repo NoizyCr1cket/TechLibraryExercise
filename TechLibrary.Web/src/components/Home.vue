@@ -2,16 +2,19 @@
     <div class="home">
         <h1>{{ msg }}</h1>
         <b-row>
-            <b-col sm="6">
+            <b-col sm="4">
                 <b-pagination v-model="currentPage" :total-rows="totalItems" :per-page="perPage" v-on:change="onPageChanged"></b-pagination>
             </b-col>
-            <b-col sm="6">
+            <b-col sm="7">
                 <b-input-group>
                     <b-form-input v-model="query" placeholder="Search for a book" @keydown.enter.native="onSearch"></b-form-input>
                     <b-input-group-append>
                         <b-button variant="primary" v-on:click="onSearch">Search</b-button>
                     </b-input-group-append>
                 </b-input-group>
+            </b-col>
+            <b-col sm="1">
+                <b-button to="/book" variant="success">New</b-button>
             </b-col>
         </b-row>
         <b-table striped hover :items="dataContext" :fields="fields" responsive="sm" :per-page="10" :current-page="currentPage" :filter="filter">
