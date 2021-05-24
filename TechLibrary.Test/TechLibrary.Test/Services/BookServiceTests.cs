@@ -298,5 +298,40 @@ namespace TechLibrary.Test.Services
                 Assert.AreEqual(updatedBook.Title, result.Title);
             });
         }
+
+        [Test]
+        public async Task CreateBookAsync_PersistsBook()
+        {
+            // Need to use a new connection specifically for this test so data updates don't break other tests.
+            var connection = CreateInMemoryConnection();
+            var dataContext = new DataContext(new DbContextOptionsBuilder<DataContext>().UseSqlite(connection).Options);
+            var bookService = new BookService(dataContext);
+
+            Seed(connection);
+
+            var newBook = new Book()
+            {
+                ISBN = "1234567890123",
+                LongDescr = "New long description.",
+                PublishedDate = "New published date",
+                ShortDescr = "New short description.",
+                ThumbnailUrl = "https://via.placeholder.com/150x200",
+                Title = "New Title",
+            };
+
+            int id = await bookService.CreateBookAsync(newBook);
+
+            var result = await bookService.GetBookByIdAsync(id);
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(newBook.ISBN, result.ISBN);
+                Assert.AreEqual(newBook.LongDescr, result.LongDescr);
+                Assert.AreEqual(newBook.PublishedDate, result.PublishedDate);
+                Assert.AreEqual(newBook.ShortDescr, result.ShortDescr);
+                Assert.AreEqual(newBook.ThumbnailUrl, result.ThumbnailUrl);
+                Assert.AreEqual(newBook.Title, result.Title);
+            });
+        }
     }
 }

@@ -94,5 +94,17 @@ namespace TechLibrary.Controllers
 
             return Ok();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateBook(BookRequest request)
+        {
+            _logger.LogInformation("Create book");
+
+            var newBook = _mapper.Map<Book>(request);
+
+            var id = await _bookService.CreateBookAsync(newBook);
+
+            return Ok(id);
+        }
     }
 }

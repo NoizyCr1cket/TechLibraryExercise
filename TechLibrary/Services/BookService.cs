@@ -21,6 +21,7 @@ namespace TechLibrary.Services
         PaginatedList<Book> GetBooksPaginatedAsync(int page, int pageSize, string query = null);
         Task<Book> GetBookByIdAsync(int bookid);
         Task UpdateBookAsync(Book editedBook);
+        Task<int> CreateBookAsync(Book book);
     }
 
     public class BookService : IBookService
@@ -66,6 +67,13 @@ namespace TechLibrary.Services
             var book = await _dataContext.Books.SingleAsync(x => x.BookId == updatedBook.BookId);
             _dataContext.Entry(book).CurrentValues.SetValues(updatedBook);
             await _dataContext.SaveChangesAsync();
+        }
+
+        public async Task<int> CreateBookAsync(Book book)
+        {
+            _dataContext.Books.Add(book);
+            await _dataContext.SaveChangesAsync();
+            return book.BookId;
         }
     }
 }

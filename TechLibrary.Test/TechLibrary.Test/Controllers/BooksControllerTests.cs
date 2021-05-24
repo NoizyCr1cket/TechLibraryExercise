@@ -142,5 +142,40 @@ namespace TechLibrary.Controllers.Tests
             //  Assert
             _mockBookService.Verify(s => s.UpdateBookAsync(updatedBook), Times.Once, $"Expected UpdateBookAsync have been called once with provided book");
         }
+
+        [Test()]
+        public async Task CreateBook_CallsCreateBookAsyncWithBookParam()
+        {
+            //  Arrange
+            var bookRequest = new Models.BookRequest()
+            {
+                ISBN = "1234567890123",
+                PublishedDate = "New published date",
+                Descr = "New description.",
+                ThumbnailUrl = "New thumbnail URL",
+                Title = "New Title",
+            };
+
+            var newBook = new Domain.Book()
+            {
+                ISBN = bookRequest.ISBN,
+                LongDescr = "Long description.",
+                PublishedDate = bookRequest.PublishedDate,
+                ShortDescr = bookRequest.Descr,
+                ThumbnailUrl = bookRequest.ThumbnailUrl,
+                Title = bookRequest.Title,
+            };
+
+            _mockMapper.Setup(m => m.Map(bookRequest, It.IsAny<Action<IMappingOperationOptions<Models.BookRequest, Domain.Book>>>()))
+                .Returns(newBook);
+            _mockBookService.Setup(b => b.UpdateBookAsync(newBook));
+            var sut = new BooksController(_mockLogger.Object, _mockBookService.Object, _mockMapper.Object);
+
+            //  Act
+            await sut.UpdateBook(newBook.BookId, bookRequest);
+
+            //  Assert
+            _mockBookService.Verify(s => s.UpdateBookAsync(newBook), Times.Once, $"Expected UpdateBookAsync have been called once with provided book");
+        }
     }
 }
